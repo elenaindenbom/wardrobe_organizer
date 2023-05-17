@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}
+  {{title}}
+{% endblock %} 
+{% block content %}
+  <h1>{{title}}</h1>
+    <div class="row">
+      {# {% include 'wardrobe/includes/switcher.html' %} #}
+      {% for item in page_obj %}
+      <div class="col-6 col-md-4 col-xl-3 col-xxl-2">
+        {% include 'wardrobe/includes/items_display.html' %}
+      </div>
+      {% endfor %}
+    </div>
+  {% include 'wardrobe/includes/paginator.html' %}
+{% endblock %}

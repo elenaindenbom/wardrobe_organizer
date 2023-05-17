@@ -1,0 +1,13 @@
+{% load thumbnail %}
+  {% comment %} <img src="{{ item.image.url }}" alt=""> {% endcomment %}
+  {% thumbnail item.image "300" upscale=True as im %}
+    <img class="card-img my-2" src="{{ im.url }}" width="{{ im.width }}" alt="">
+  {% endthumbnail %}
+  <p>{{ item.name }}</p>
+  {% comment "" %}
+  <a href="{% url 'wardrobe:item_detail' item.id %}">подробная информация </a> <br>
+  {% if item.outfit %}
+    <a href="{% url 'wardrobe:outfit_list' item.outfit.id %}">все записи группы</a>
+  {% endif %}
+  {% endcomment %}
+{# {% if not forloop.last %}<hr>{% endif %} #}
