@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load user_filters %}
+{% block title %}
+  {{item.name}}
+{% endblock %} 
+{% block content %}
+  <div class="container">
+  <h3> {{item.name|capfirst}} </h3>
+  <div class="row">
+    <aside class="col-12 col-md-6">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <b> Место хранения: </b> {{ item.storage_place }} 
+        </li>
+        {% comment %} {% if item.need_to_buy %}
+          <li class="list-group-item">
+            Группа: {{post.group}} <br>
+            <a href="{% url 'posts:group_list' post.group.slug %}">
+              все записи группы
+            </a>
+          </li>
+        {% endif %} {% endcomment %}
+        {% if item.care.all %}
+        <li class="list-group-item">
+          <b> Уход: </b> 
+          <ul>
+            {% for care in item.care.all %}
+              <li>
+              {{ care.recommendation }}
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endif%}
+        <li class="list-group-item">
+          <b> Количество использований: </b> {{ item.number_of_uses }}
+        </li>
+        {% if item.prise %}
+          <li class="list-group-item">
+            <b> Цена: </b> {{ item.price }}
+          </li>
+        {% endif %}
+        {% if item.need_to_buy %}
+          <li class="list-group-item" style="color:red">
+            Вещи пока нет в гардеробе
+          </li>
+        {% endif %}
+        {% if item.note %}
+          <li class="list-group-item">
+            <b> Заметки: </b> {{ item.note }}
+          </li>
+        {% endif %}
+        <article class="col-12 col-md-6 col-xxl-4">
+        {% if item.user == request.user %}
+          <p>
+            <a class="btn btn-primary" href="{% url 'wardrobe:item_edit' item.id %}">
+              редактировать
+            </a>
+          </p>
+        {% endif %}
+        {% if item.user == request.user %}
+          <p>
+            <a class="btn btn-primary" href="{% url 'wardrobe:item_delete' item.id %}">
+              удалить
+            </a>
+          </p>
+        {% endif %}
+        </article>
+        {% comment %} <li class="list-group-item d-flex justify-content-between align-items-center">
+          Всего постов автора:  <span >{{ post.author.posts.count }}</span>
+        </li>
+        <li class="list-group-item">
+          <a href="{% url 'posts:profile' post.author %}">
+            все посты пользователя
+          </a>
+        </li> {% endcomment %}
+      </ul>
+    </aside>
+    <article class="col-12 col-md-6 col-xxl-4 order-first">
+      {% thumbnail item.image "900" crop="center" upscale=True as im %}
+        <img class="card-img my-2" src="{{ im.url }}">
+      {% endthumbnail %}
+
+      {% comment %} 
+
+      {% if user.is_authenticated %}
+        <div class="card my-4">
+          <h5 class="card-header">Добавить комментарий:</h5>
+          <div class="card-body">
+            <form method="post" action="{% url 'posts:add_comment' post.id %}">
+              {% csrf_token %}      
+              <div class="form-group mb-2">
+                {{ form.text|addclass:"form-control" }}
+              </div>
+              <button type="submit" class="btn btn-primary">Отправить</button>
+            </form>
+          </div>
+        </div>
+      {% endif %}
+      
+      {% for comment in comments %}
+        <div class="media mb-4">
+          <div class="media-body">
+            <h5 class="mt-0">
+              <a href="{% url 'posts:profile' comment.author.username %}">
+                {{ comment.author.username }}
+              </a>
+            </h5>
+              <p>
+               {{ comment.text }}
+              </p>
+            </div>
+          </div>
+      {% endfor %} {% endcomment %}
+    </article>
+  </div>
+  </div> 
+{% endblock %}

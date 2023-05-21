@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-z!2&0v&4qmo2nhxk8&yy@#-!jzlti(y^gzm$#+ld^ac=@t5j#0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -112,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -137,7 +137,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
-ITEMS_PER_PAGE = 10
+ITEMS_PER_PAGE = 24
 
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
@@ -153,3 +153,6 @@ LOGOUT_REDIRECT_URL = 'about:about'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')

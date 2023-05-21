@@ -3,22 +3,21 @@
   {% with request.resolver_match.view_name as view_name %}
   <nav class="navbar navbar-light" style="background-color: #20c997">
     <div class="container">
-      <a class="navbar-brand" href="{% url 'wardrobe:index' %}">
+      <a class="navbar-brand" href="{% url 'wardrobe:index' %}" title="Список всех вещей">
         <img src="{% static 'img/logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
         <span style="color:red">W</span>ardrobe
       </a>
       <ul class="nav nav-pills">
-        {% comment %}
         <li class="nav-item"> 
-          <a class="nav-link {% if view_name  == '' %}active{% endif %}" href="{% url '' %}">Об авторе</a>
+          <a class="nav-link link-light {% if view_name  == 'about:about' %}active{% endif %}" href="{% url 'about:about' %}">О проекте</a>
         </li>
-        {% endcomment %}
         {% if user.is_authenticated %}
-        {% comment %}
         <li class="nav-item"> 
-          <a class="nav-link {% if view_name  == '' %}active{% endif %}" href="{% url '' %}">Новая запись</a>
+          <a class="nav-link {% if view_name  == 'wardrobe:item_create' %}active{% endif %}" href="{% url 'wardrobe:item_create' %}">Добавить предмет</a>
         </li>
-        {% endcomment %}
+        <li class="nav-item"> 
+          <a class="nav-link {% if view_name  == 'wardrobe:outfit_create' %}active{% endif %}" href="{% url 'wardrobe:outfit_create' %}">Добавить комплект</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link link-light {% if view_name  == 'users:password_change_form' %}active{% endif %}" href="{% url 'users:password_change_form' %}">Изменить пароль</a>
         </li>

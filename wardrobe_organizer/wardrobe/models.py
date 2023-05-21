@@ -6,16 +6,17 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 User = get_user_model()
 
 
-class Usage(models.Model):
+class Purpose(models.Model):
     name = models.CharField(
-        'Название области применения',
+        'Назначение',
+        unique=True,
         max_length=256
     )
 
     class Meta:
         ordering = ['name']
-        verbose_name = 'Область применения'
-        verbose_name_plural = 'Области применения'
+        verbose_name = 'Назначение'
+        verbose_name_plural = 'Назначения'
 
     def __str__(self):
         return self.name
@@ -25,13 +26,13 @@ class Type(models.Model):
     TYPE_CATEGORIES = [
         ('Top', 'Верх'),
         ('Bottom', 'Низ'),
-        ('Dress', 'Платье'),
+        ('Full length', 'Полная длина'),
         ('Outerwear', 'Верхняя одежда'),
         ('Shoes', 'Обувь'),
         ('Accessories', 'Аксессуары'),
         ('Other', 'Другое'),
     ]
-    name = models.CharField('Название типа', max_length=256)
+    name = models.CharField('Название типа', max_length=256, unique=True)
     category = models.CharField(
         'Категория типа',
         max_length=256,
@@ -48,16 +49,23 @@ class Type(models.Model):
 
 
 class Care(models.Model):
-    recommendation = models.CharField('Рекомендация по уходу', max_length=256)
+    recommendation = models.CharField(
+        'Рекомендация по уходу',
+        max_length=256,
+        unique=True,
+        blank=True,
+    )
 
     class Meta:
         ordering = ['recommendation']
         verbose_name = 'Рекомендация по уходу'
         verbose_name_plural = 'Рекомендации по уходу'
 
+    # def get_recommendation(self):
+    #     return "/n".join([str(p) for p in self.recommendation.all()])
+
     def __str__(self):
-        TEXT_LENGTH = 15
-        return self.recommendation[:TEXT_LENGTH]
+        return self.recommendation
 
 
 class Use(models.Model):
@@ -68,7 +76,7 @@ class Use(models.Model):
     )
     time = models.DateTimeField(
         'Дата использования',
-        auto_now=True
+        auto_now=True,
     )
 
     class Meta:
@@ -98,9 +106,12 @@ class Item(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Пользователь'
     )
-    care = models.ForeignKey(
+    image = models.ImageField(
+        'Изображение',
+        upload_to='items/',
+    )
+    care = models.ManyToManyField(
         Care,
-        on_delete=models.PROTECT,
         verbose_name='Рекомендации по уходу',
         blank=True,
     )
@@ -147,20 +158,16 @@ class Item(models.Model):
         on_delete=models.PROTECT,
         verbose_name='Категория'
     )
-    usage = models.ForeignKey(
-        Usage,
+    purpose = models.ForeignKey(
+        Purpose,
         on_delete=models.PROTECT,
-        verbose_name='Область применения',
+        verbose_name='Назначение',
         null=True,
         blank=True,
     )
     note = models.TextField(
         'Дополнительные заметки',
         blank=True,
-    )
-    image = models.ImageField(
-        'Изображение',
-        upload_to='items/',
     )
     color = models.CharField('Цвет', max_length=256)
     # color_image = models.ImageField(
@@ -170,7 +177,8 @@ class Item(models.Model):
     storage_place = models.CharField(
         'Место хранения',
         max_length=256,
-        blank=True
+        blank=True,
+        default='Не указано'
     )
 
     class Meta:
@@ -204,14 +212,19 @@ class Outfit(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Пользователь'
     )
+    image = models.ImageField(
+        'Изображение комплекта',
+        upload_to='outfits/',
+        blank=True,
+    )
     season = models.CharField(
         'Сезон',
         max_length=256,
         choices=SEASONS,
     )
-    item = models.ManyToManyField(
+    items = models.ManyToManyField(
         Item,
-        verbose_name='Предмет гардероба',
+        verbose_name='Предметы гардероба',
     )
     number_of_uses = models.PositiveSmallIntegerField(
         'Количество использований',
@@ -227,16 +240,12 @@ class Outfit(models.Model):
             )
         )
     )
-    usage = models.ForeignKey(
-        Usage,
+    purpose = models.ForeignKey(
+        Purpose,
         verbose_name='Область применения',
         null=True,
         blank=True,
         on_delete=models.PROTECT,
-    )
-    image = models.ImageField(
-        'Изображение',
-        upload_to='outfits/',
     )
     note = models.TextField(
         'Дополнительные заметки',
@@ -264,6 +273,8 @@ class Outfit(models.Model):
         Use,
         on_delete=models.CASCADE,
         verbose_name='Информация об использовании',
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -289,9 +300,9 @@ class Capsule(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Пользователь'
     )
-    outfit = models.ManyToManyField(
+    outfits = models.ManyToManyField(
         Outfit,
-        verbose_name='Комплект'
+        verbose_name='Комплекты'
     )
 
     class Meta:

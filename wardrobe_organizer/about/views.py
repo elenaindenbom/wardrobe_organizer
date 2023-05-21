@@ -1,5 +1,5 @@
 from django.views.generic.base import TemplateView
 
 
-class AboutAuthorView(TemplateView):
+class AboutProjectView(TemplateView):
     template_name = 'about/about.html'

@@ -1,11 +1,16 @@
 {% load thumbnail %}
-  {% comment %} <img src="{{ item.image.url }}" alt=""> {% endcomment %}
   {% thumbnail item.image "300" upscale=True as im %}
-    <img class="card-img my-2" src="{{ im.url }}" width="{{ im.width }}" alt="">
+    <a
+      href="{% url 'wardrobe:item_detail' item.id %}"><img
+      class="card-img my-2"
+      src="{{ im.url }}"
+      width="{{ im.width }}"
+      alt=""
+      title="Подробная информация">
+    </a> <br>
   {% endthumbnail %}
-  <p>{{ item.name }}</p>
+  <p>{{ item.name|capfirst }}</p>
   {% comment "" %}
-  <a href="{% url 'wardrobe:item_detail' item.id %}">подробная информация </a> <br>
   {% if item.outfit %}
     <a href="{% url 'wardrobe:outfit_list' item.outfit.id %}">все записи группы</a>
   {% endif %}

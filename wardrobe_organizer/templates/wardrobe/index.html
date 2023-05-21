@@ -1,16 +1,27 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}
   {{title}}
 {% endblock %} 
 {% block content %}
-  <h1>{{title}}</h1>
-    <div class="row">
-      {# {% include 'wardrobe/includes/switcher.html' %} #}
-      {% for item in page_obj %}
-      <div class="col-6 col-md-4 col-xl-3 col-xxl-2">
-        {% include 'wardrobe/includes/items_display.html' %}
-      </div>
-      {% endfor %}
+  <h1>
+    {{title}}
+    {% if user.is_authenticated %}
+      <a 
+        href="{% url 'wardrobe:item_create' %}"><img
+        src="{% static 'img/add.png' %}" width="40" height="40"
+        class="d-inline-block align-top" alt=""
+        title="Добавить вещь">
+      </a>
+    {% endif %}
+  </h1>
+  <div class="row">
+    {# {% include 'wardrobe/includes/switcher.html' %} #}
+    {% for item in page_obj %}
+    <div class="col-6 col-md-4 col-xl-3 col-xxl-2">
+      {% include 'wardrobe/includes/items_display.html' %}
     </div>
+    {% endfor %}
+  </div>
   {% include 'wardrobe/includes/paginator.html' %}
 {% endblock %}
