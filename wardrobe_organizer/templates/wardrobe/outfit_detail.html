@@ -2,84 +2,40 @@
 {% load thumbnail %}
 {% load user_filters %}
 {% block title %}
-  {{item.name}}
+  {{outfit}}
 {% endblock %} 
 {% block content %}
   <div class="container">
-  <h3> {{item.name|capfirst}} </h3>
+  <h3> {{outfit|capfirst}} </h3>
   <div class="row">
     <aside class="col-12 col-md-6">
       <ul class="list-group list-group-flush">
         <li class="list-group-item">
-          <b> Место хранения: </b> {{ item.storage_place }} 
+          <b> Температура использования </b> (в градусах):
+          {{ outfit.min_temperature }} - {{outfit.max_temperature}}
         </li>
-        {% comment %} {% if item.need_to_buy %}
-          <li class="list-group-item">
-            Группа: {{post.group}} <br>
-            <a href="{% url 'posts:group_list' post.group.slug %}">
-              все записи группы
-            </a>
-          </li>
-        {% endif %} {% endcomment %}
-        {% if item.care.all %}
         <li class="list-group-item">
-          <b> Уход: </b> 
-          <ul>
-            {% for care in item.care.all %}
-              <li>
-              {{ care.recommendation }}
-              </li>
-            {% endfor %}
-          </ul>
+          <b> Количество использований: </b> {{ outfit.number_of_uses }}
         </li>
-        {% endif%}
         <li class="list-group-item">
-          <b> Количество использований: </b> {{ item.number_of_uses }}
+          <b> Дата последнего использования: </b> {{ outfit.using_information.time.last }}
         </li>
-        {% if item.prise %}
+        {% if outfit.note %}
           <li class="list-group-item">
-            <b> Цена: </b> {{ item.price }}
+            <b> Заметки: </b> {{ outfit.note }}
           </li>
-        {% endif %}
-        {% if item.need_to_buy %}
-          <li class="list-group-item" style="color:red">
-            Вещи пока нет в гардеробе
-          </li>
-        {% endif %}
-        {% if item.note %}
-          <li class="list-group-item">
-            <b> Заметки: </b> {{ item.note }}
-          </li>
-        {% endif %}
-        {% if not item.need_to_buy %}
-          {% if laundry %}
-            <p><b> Предмет находится в стирке </b>
-            <a
-              class="btn btn-dark"
-              href="{% url 'wardrobe:del_laundry' item.id %}" role="button"
-            >
-              Убрать
-            </a></p>
-          {% else %}
-              <p><a
-                class="btn btn-light" style="color:green"
-                href="{% url 'wardrobe:add_laundry' item.id %}" role="button"
-              >
-                Добавить в список стирки
-              </a></p>
-          {% endif %}
         {% endif %}
         <article class="col-12 col-md-6 col-xxl-4">
-        {% if item.user == request.user %}
+        {% if outfit.user == request.user %}
           <p>
-            <a class="btn btn-primary" href="{% url 'wardrobe:item_edit' item.id %}">
+            <a class="btn btn-primary" href="{% url 'wardrobe:outfit_edit' outfit.id %}">
               редактировать
             </a>
           </p>
         {% endif %}
-        {% if item.user == request.user %}
+        {% if outfit.user == request.user %}
           <p>
-            <a class="btn btn-primary" href="{% url 'wardrobe:item_delete' item.id %}">
+            <a class="btn btn-primary" href="{% url 'wardrobe:outfit_delete' outfit.id %}">
               удалить
             </a>
           </p>
@@ -96,7 +52,7 @@
       </ul>
     </aside>
     <article class="col-12 col-md-6 col-xxl-4 order-first">
-      {% thumbnail item.image "900" crop="center" upscale=True as im %}
+      {% thumbnail outfit.image "900" crop="center" upscale=True as im %}
         <img class="card-img my-2" src="{{ im.url }}">
       {% endthumbnail %}
 
@@ -132,6 +88,7 @@
           </div>
       {% endfor %} {% endcomment %}
     </article>
+    {% include 'wardrobe/includes/items_display.html' %}
   </div>
   </div> 
 {% endblock %}

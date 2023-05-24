@@ -15,14 +15,13 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls.static import static
-# from xml.etree.ElementInclude import include
 from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
     path('', include('wardrobe.urls', namespace='wardrobe')),
     path('admin/', admin.site.urls),
-    path('auth/', include('users.urls')),
+    path('auth/', include('users.urls', namespace='users')),
     path('auth/', include('django.contrib.auth.urls')),
     path('about/', include('about.urls', namespace='about')),
 ]

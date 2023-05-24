@@ -15,7 +15,7 @@ class ItemForm(forms.ModelForm):
                             'но они нужны для завершения образа. '
                             'Присвойте им отметку "Нужно докупить" '
                             'со значением "Да". Иначе оставте "Нет".'),
-            'care': ('Зажмите ctrl чтобы выбрать несколько вариантов.')
+            'care': 'Зажмите ctrl чтобы выбрать несколько вариантов.'
         }
 
 
@@ -24,3 +24,6 @@ class OutfitForm(forms.ModelForm):
         model = Outfit
         fields = ('image', 'name', 'items', 'season',
                   'purpose', 'min_temperature', 'max_temperature', 'note')
+        help_texts = {
+            'items': 'Зажмите ctrl чтобы выбрать несколько вариантов.'
+        }

@@ -1,9 +1,14 @@
 from django.db import models
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 User = get_user_model()
+
+
+def user_directory_path(instance, filename):
+    return f'items/{instance.user.username}/{filename}'
 
 
 class Purpose(models.Model):
@@ -61,9 +66,6 @@ class Care(models.Model):
         verbose_name = 'Рекомендация по уходу'
         verbose_name_plural = 'Рекомендации по уходу'
 
-    # def get_recommendation(self):
-    #     return "/n".join([str(p) for p in self.recommendation.all()])
-
     def __str__(self):
         return self.recommendation
 
@@ -108,7 +110,7 @@ class Item(models.Model):
     )
     image = models.ImageField(
         'Изображение',
-        upload_to='items/',
+        upload_to=user_directory_path,
     )
     care = models.ManyToManyField(
         Care,
@@ -156,7 +158,7 @@ class Item(models.Model):
     type = models.ForeignKey(
         Type,
         on_delete=models.PROTECT,
-        verbose_name='Категория'
+        verbose_name='Тип'
     )
     purpose = models.ForeignKey(
         Purpose,
@@ -172,7 +174,7 @@ class Item(models.Model):
     color = models.CharField('Цвет', max_length=256)
     # color_image = models.ImageField(
     #     'Визуализация цвета',
-    #     upload_to='items/',
+    #     upload_to='color/',
     # )
     storage_place = models.CharField(
         'Место хранения',
@@ -189,6 +191,9 @@ class Item(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('wardrobe:item_detail', kwargs={'item_id': self.pk})
 
 
 class Outfit(models.Model):
@@ -287,6 +292,9 @@ class Outfit(models.Model):
         if not self.name:
             return f'Комплект {self.id}'
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('wardrobe:outfit_detail', kwargs={'outfit_id': self.pk})
 
 
 class Capsule(models.Model):

@@ -160,3 +160,8 @@ cython_debug/
 #.idea/
 
 .vscode/
+
+# папки со статикой и медиа
+static/
+wardrobe_organizer/static/
+wardrobe_organizer/media/
