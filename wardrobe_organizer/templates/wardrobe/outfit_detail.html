@@ -18,8 +18,26 @@
           <b> Количество использований: </b> {{ outfit.number_of_uses }}
         </li>
         <li class="list-group-item">
-          <b> Дата последнего использования: </b> {{ outfit.using_information.time.last }}
+          <b> Дата последнего использования: </b> {{ use_date }}
         </li>
+        {% if already_used %}
+          <p>Комплект сегодня уже используется
+            <a
+              class="btn btn-primary"
+              href="{% url 'wardrobe:cancel_outfit_use' outfit.id %}"
+              role="button"
+            >
+              Отменить использование
+            </a>
+          </p>
+        {% else %}
+          <p><a
+            class="btn btn-light" style="color:green"
+            href="{% url 'wardrobe:outfit_use' outfit.id %}" role="button"
+          >
+            Использовать
+          </a></p>
+        {% endif %}
         {% if outfit.note %}
           <li class="list-group-item">
             <b> Заметки: </b> {{ outfit.note }}

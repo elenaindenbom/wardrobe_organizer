@@ -3,13 +3,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.cache import cache_page
-from .models import Outfit, Item, Laundry
+from .models import Outfit, Item, Laundry, Use
 from .forms import ItemForm, OutfitForm
 from django.shortcuts import redirect
 from django.conf import settings
+from django.utils import timezone
+from datetime import datetime
 
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, ListView
 
 
 CACHE_UPDATE_FREQUENCY = 20
@@ -29,7 +31,7 @@ def index(request):
     if request.user.is_authenticated:
         template = 'wardrobe/index.html'
         user = request.user
-        items_list = user.items.all()
+        items_list = user.items.filter(need_to_buy=False)
         page_obj = paginator(items_list, request)
         context = {
             'title': title,
@@ -65,32 +67,38 @@ def outfit_detail(request, outfit_id):
     """Страница комплекта"""
     outfit = get_object_or_404(Outfit, id=outfit_id)
     items_list = outfit.items.all()
+    use_date = Use.objects.filter(outfit=outfit).first()
+    already_used = False
+    if use_date and datetime.now().date() == use_date.date:
+        already_used = True
     page_obj = paginator(items_list, request)
     if outfit.user != request.user:
         return redirect('wardrobe:index')
     context = {
         'outfit': outfit,
         'page_obj': page_obj,
+        'use_date': use_date,
+        'already_used': already_used,
     }
     return render(request, 'wardrobe/outfit_detail.html', context)
 
 
-@login_required
-def item_create(request):
-    """Добавление нового предмета"""
-    if request.method == 'POST':
-        form = ItemForm(
-            request.POST or None,
-            files=request.FILES or None,
-        )
-        if form.is_valid():
-            new_item = form.save(commit=False)
-            new_item.user = request.user
-            new_item.save()
-            return redirect('wardrobe:item_detail', item_id=new_item.id)
-        return render(request, 'wardrobe/create_item.html', {'form': form})
-    form = ItemForm()
-    return render(request, 'wardrobe/create_item.html', {'form': form})
+# @login_required
+# def item_create(request):
+#     """Добавление нового предмета"""
+#     if request.method == 'POST':
+#         form = ItemForm(
+#             request.POST or None,
+#             files=request.FILES or None,
+#         )
+#         if form.is_valid():
+#             new_item = form.save(commit=False)
+#             new_item.user = request.user
+#             new_item.save()
+#             return redirect('wardrobe:item_detail', item_id=new_item.id)
+#         return render(request, 'wardrobe/create_item.html', {'form': form})
+#     form = ItemForm()
+#     return render(request, 'wardrobe/create_item.html', {'form': form})
 
 
 class ItemCreate(CreateView):
@@ -106,17 +114,38 @@ class ItemCreate(CreateView):
         return super().form_valid(form)
 
 
-class OutfitCreate(CreateView):
-    """Добавление нового комплекта"""
-    form_class = OutfitForm
-    success_url = reverse_lazy('wardrobe:outfit_list')
-    template_name = 'wardrobe/create_object.html'
+# class OutfitCreate(CreateView):
+#     """Добавление нового комплекта"""
+#     form_class = OutfitForm
+#     success_url = reverse_lazy('wardrobe:outfit_list')
+#     template_name = 'wardrobe/create_object.html'
 
-    def form_valid(self, form):
-        new_item = form.save(commit=False)
-        new_item.user = self.request.user
-        new_item.save()
-        return super().form_valid(form)
+#     def form_valid(self, form):
+#         new_item = form.save(commit=False)
+#         new_item.user = self.request.user
+#         new_item.save()
+#         return super().form_valid(form)
+
+
+@login_required
+def outfit_create(request):
+    """Создание нового комплекта"""
+    if request.method == 'POST':
+        form = OutfitForm(
+            request.POST or None,
+            files=request.FILES or None,
+        )
+        if form.is_valid():
+            new_outfit = form.save(commit=False)
+            new_outfit.user = request.user
+            new_outfit.save()
+            return redirect('wardrobe:outfit_list')
+        form.fields['items'].queryset = Item.objects.filter(
+                                        user=request.user.id)
+        return render(request, 'wardrobe/create_object.html', {'form': form})
+    form = OutfitForm()
+    form.fields['items'].queryset = Item.objects.filter(user=request.user.id)
+    return render(request, 'wardrobe/create_object.html', {'form': form})
 
 
 @login_required
@@ -154,6 +183,7 @@ def outfit_edit(request, outfit_id):
         files=request.FILES or None,
         instance=outfit
     )
+    form.fields['items'].queryset = Item.objects.filter(user=request.user.id)
     if form.is_valid():
         form.save()
         return redirect('wardrobe:outfit_detail', outfit_id=outfit_id)
@@ -218,6 +248,40 @@ def del_laundry(request, item_id):
     laundry = get_object_or_404(Laundry, item=item, user=request.user)
     laundry.delete()
     return redirect('wardrobe:item_detail', item_id=item_id)
+
+
+class LaundryList(ListView):
+    model = Laundry
+    template_name = 'wardrobe/laundry_list.html'
+    extra_context = {'title': 'Список вещей в стирке'}
+
+    def get_queryset(self):
+        return Laundry.objects.filter(user=self.request.user)
+
+
+@login_required
+def outfit_use(request, outfit_id):
+    """Добавление информации об использовании комплекта"""
+    outfit = get_object_or_404(Outfit, pk=outfit_id)
+    Use.objects.create(outfit=outfit)
+    outfit.number_of_uses += 1
+    outfit.save()
+    uses = Use.objects.filter(outfit=outfit)
+    if uses.count() > 10:
+        uses.earliest().delete()
+    return redirect('wardrobe:outfit_detail', outfit_id=outfit_id)
+
+
+@login_required
+def cancel_outfit_use(request, outfit_id):
+    """Отмена использования комплекта в текущий день"""
+    outfit = get_object_or_404(Outfit, pk=outfit_id)
+    use = Use.objects.filter(outfit=outfit).first()
+    if use and datetime.now().date() == use.date:
+        outfit.number_of_uses -= 1
+        outfit.save()
+        use.delete()
+    return redirect('wardrobe:outfit_detail', outfit_id=outfit_id)
 
 
 def some_view(request):

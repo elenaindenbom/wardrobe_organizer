@@ -38,6 +38,11 @@
             href="{% url 'wardrobe:outfit_list' %}">Комплекты
           </a>
         </li>
+        <li class="nav-item"> 
+          <a class="nav-link link-dark {% if view_name  == 'wardrobe:laundry_list' %}active{% endif %}"
+            href="{% url 'wardrobe:laundry_list' %}">Стирка
+          </a>
+        </li>
         <li class="nav-item">
           <a class="nav-link link-light {% if view_name  == 'users:password_change_form' %}active{% endif %}"
             href="{% url 'users:password_change_form' %}">Изменить пароль

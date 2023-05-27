@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  {{title}}
+{% endblock %}
+{% block content %}
+  <h1>{{title}}</h1>
+  <ul>
+    {% for object in object_list %}
+      <li>
+        <a
+          href="{{ object.item.get_absolute_url }}"
+          title="Подробная информация">{{object.item.name}}
+        </a> <br>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

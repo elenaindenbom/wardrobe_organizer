@@ -1,9 +1,10 @@
 from django.contrib import admin
 
-from .models import Item, Care, Type, Purpose, Outfit
+from .models import Item, Care, Type, Purpose, Outfit, Use
 
 admin.site.register(Care)
 admin.site.register(Purpose)
+admin.site.register(Use)
 
 
 @admin.register(Item)

@@ -70,27 +70,6 @@ class Care(models.Model):
         return self.recommendation
 
 
-class Use(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        verbose_name='Пользователь'
-    )
-    time = models.DateTimeField(
-        'Дата использования',
-        auto_now=True,
-    )
-
-    class Meta:
-        ordering = ['-time']
-        verbose_name = 'Информация об использовании'
-        verbose_name_plural = 'Информация об использовании'
-        default_related_name = 'use'
-
-    def __str__(self):
-        return self.time
-
-
 class Item(models.Model):
     SA = 'Spring-Autumn'
     SUMMER = 'Summer'
@@ -274,13 +253,6 @@ class Outfit(models.Model):
                 50, message='Температура должна быть меньше 50 градусов')
         )
     )
-    using_information = models.ForeignKey(
-        Use,
-        on_delete=models.CASCADE,
-        verbose_name='Информация об использовании',
-        blank=True,
-        null=True,
-    )
 
     class Meta:
         ordering = ['-number_of_uses']
@@ -369,3 +341,28 @@ class Laundry(models.Model):
             models.UniqueConstraint(fields=['user', 'item'],
                                     name='unique_laundry')
         ]
+
+
+class Use(models.Model):
+    outfit = models.ForeignKey(
+        Outfit,
+        on_delete=models.CASCADE,
+        verbose_name='Предмет',
+    )
+    date = models.DateField(
+        'Дата использования',
+        auto_now=True,
+    )
+
+    class Meta:
+        ordering = ['-date']
+        verbose_name = 'Информация об использовании'
+        verbose_name_plural = 'Информация об использовании'
+        default_related_name = 'use'
+        constraints = [
+            models.UniqueConstraint(fields=['outfit', 'date'],
+                                    name='unique_date_use')
+        ]
+
+    def __str__(self):
+        return self.date.strftime("%m-%d-%Y")

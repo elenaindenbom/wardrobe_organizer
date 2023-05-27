@@ -27,3 +27,9 @@ class OutfitForm(forms.ModelForm):
         help_texts = {
             'items': 'Зажмите ctrl чтобы выбрать несколько вариантов.'
         }
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     user = kwargs.get('user')
+    #     item_qs = Item.objects.filter(user=user.id)
+    #     self.fields['items'].queryset = item_qs
