@@ -1,0 +1,28 @@
+<form method="get">
+  {% load user_filters %}
+  <div class="row">
+    {% for f in filter.form %}
+      <div class="col-6 col-md-4 col-xl-3 col-xxl-2">
+        <label 
+          class="form-group row"
+          for="{{ f.id_for_label }}"
+        ><h6>{{f.label}}: </h6></label>
+        {{ f|addclass:'form-control' }}
+      </div>
+    {% endfor %}
+    <div class="col-6 col-md-4 col-xl-3 col-xxl-2 align-self-end">
+      <input
+        type="submit"
+        value="Фильтровать"
+        class="btn btn-outline-success"
+      >
+    </div>
+  </div>
+  {% comment %} <div class="d-flex justify-content-end">
+    <input
+      type="submit"
+      value="Фильтровать"
+      class="btn btn-primary"
+    >
+  </div> {% endcomment %}
+</form>

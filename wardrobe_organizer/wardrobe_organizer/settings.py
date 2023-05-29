@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'wardrobe.apps.WardrobeConfig',
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',

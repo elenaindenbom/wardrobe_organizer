@@ -39,7 +39,7 @@ class Type(models.Model):
     ]
     name = models.CharField('Название типа', max_length=256, unique=True)
     category = models.CharField(
-        'Категория типа',
+        'Категория',
         max_length=256,
         choices=TYPE_CATEGORIES,
     )

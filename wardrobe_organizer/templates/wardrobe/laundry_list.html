@@ -5,8 +5,9 @@
 {% endblock %}
 {% block content %}
   <h1>{{title}}</h1>
+  {% comment %} <p>{% include 'wardrobe/includes/filter.html' %}</p> {% endcomment %}
   <ul>
-    {% for object in object_list %}
+    {% for object in filter.qs %}
       <li>
         <a
           href="{{ object.item.get_absolute_url }}"

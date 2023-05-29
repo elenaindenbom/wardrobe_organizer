@@ -7,8 +7,8 @@ from .models import Outfit, Item, Laundry, Use
 from .forms import ItemForm, OutfitForm
 from django.shortcuts import redirect
 from django.conf import settings
-from django.utils import timezone
 from datetime import datetime
+from .filters import ItemFilter, OutfitFilter, LaundryFilter
 
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView
@@ -31,11 +31,12 @@ def index(request):
     if request.user.is_authenticated:
         template = 'wardrobe/index.html'
         user = request.user
-        items_list = user.items.filter(need_to_buy=False)
-        page_obj = paginator(items_list, request)
+        filter = ItemFilter(request.GET, queryset=user.items.all())
+        page_obj = paginator(filter.qs, request)
         context = {
             'title': title,
             'page_obj': page_obj,
+            'filter': filter,
         }
         return render(request, template, context)
     template = 'about/about.html'
@@ -211,11 +212,28 @@ def outfit_list(request):
     title = 'Коплекты'
     template = 'wardrobe/outfit_list.html'
     user = request.user
-    outfits_list = user.outfits.all()
-    page_obj = paginator(outfits_list, request)
+    filter = OutfitFilter(request.GET, queryset=user.outfits.all())
+    page_obj = paginator(filter.qs, request)
     context = {
         'title': title,
         'page_obj': page_obj,
+        'filter': filter,
+    }
+    return render(request, template, context)
+
+
+def items_outfits(request, item_id):
+    """Вывод комплектов содержащих предмет"""
+    template = 'wardrobe/outfit_list.html'
+    item = get_object_or_404(Item, pk=item_id)
+    outfit_list = item.outfits.filter(user=request.user)
+    filter = OutfitFilter(request.GET, queryset=outfit_list)
+    page_obj = paginator(filter.qs, request)
+    title = f'{item.name}. Все комплекты:'
+    context = {
+        'title': title,
+        'page_obj': page_obj,
+        'filter': filter,
     }
     return render(request, template, context)
 
@@ -253,10 +271,21 @@ def del_laundry(request, item_id):
 class LaundryList(ListView):
     model = Laundry
     template_name = 'wardrobe/laundry_list.html'
-    extra_context = {'title': 'Список вещей в стирке'}
+    # extra_context = {
+    #     'title': 'Список вещей в стирке',
+    #     }
 
     def get_queryset(self):
         return Laundry.objects.filter(user=self.request.user)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Список вещей в стирке'
+        context['filter'] = LaundryFilter(
+            self.request.GET,
+            queryset=Laundry.objects.filter(user=self.request.user)
+        )
+        return context
 
 
 @login_required

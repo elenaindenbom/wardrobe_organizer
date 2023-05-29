@@ -13,14 +13,6 @@
         <li class="list-group-item">
           <b> Место хранения: </b> {{ item.storage_place }} 
         </li>
-        {% comment %} {% if item.need_to_buy %}
-          <li class="list-group-item">
-            Группа: {{post.group}} <br>
-            <a href="{% url 'posts:group_list' post.group.slug %}">
-              все записи группы
-            </a>
-          </li>
-        {% endif %} {% endcomment %}
         {% if item.care.all %}
         <li class="list-group-item">
           <b> Уход: </b> 
@@ -56,7 +48,9 @@
             <p><b> Предмет находится в стирке </b>
             <a
               class="btn btn-dark"
-              href="{% url 'wardrobe:del_laundry' item.id %}" role="button"
+              href="{% url 'wardrobe:del_laundry' item.id %}"
+              role="button"
+              style="background-color: #20c997"
             >
               Убрать
             </a></p>
@@ -85,52 +79,15 @@
           </p>
         {% endif %}
         </article>
-        {% comment %} <li class="list-group-item d-flex justify-content-between align-items-center">
-          Всего постов автора:  <span >{{ post.author.posts.count }}</span>
-        </li>
-        <li class="list-group-item">
-          <a href="{% url 'posts:profile' post.author %}">
-            все посты пользователя
-          </a>
-        </li> {% endcomment %}
       </ul>
     </aside>
     <article class="col-12 col-md-6 col-xxl-4 order-first">
       {% thumbnail item.image "900" crop="center" upscale=True as im %}
         <img class="card-img my-2" src="{{ im.url }}">
       {% endthumbnail %}
-
-      {% comment %} 
-
-      {% if user.is_authenticated %}
-        <div class="card my-4">
-          <h5 class="card-header">Добавить комментарий:</h5>
-          <div class="card-body">
-            <form method="post" action="{% url 'posts:add_comment' post.id %}">
-              {% csrf_token %}      
-              <div class="form-group mb-2">
-                {{ form.text|addclass:"form-control" }}
-              </div>
-              <button type="submit" class="btn btn-primary">Отправить</button>
-            </form>
-          </div>
-        </div>
-      {% endif %}
-      
-      {% for comment in comments %}
-        <div class="media mb-4">
-          <div class="media-body">
-            <h5 class="mt-0">
-              <a href="{% url 'posts:profile' comment.author.username %}">
-                {{ comment.author.username }}
-              </a>
-            </h5>
-              <p>
-               {{ comment.text }}
-              </p>
-            </div>
-          </div>
-      {% endfor %} {% endcomment %}
+      <a class="btn btn-link" href="{% url 'wardrobe:items_outfits' item.id %}">
+        Все комплекты с предметом
+      </a>
     </article>
   </div>
   </div> 
