@@ -4,7 +4,6 @@ from .models import Item, Type, Outfit, Laundry, Care
 
 
 class ItemFilter(django_filters.FilterSet):
-    # type = filters.ModelChoiceFilter(queryset=types)
 
     class Meta:
         model = Item
