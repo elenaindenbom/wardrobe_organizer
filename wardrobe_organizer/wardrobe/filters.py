@@ -1,6 +1,7 @@
 import django_filters
-from django import forms
-from .models import Item, Type, Outfit, Laundry, Care
+from .models.item import Item
+from .models.outfit import Outfit
+from .models.item_actions import Laundry
 
 
 class ItemFilter(django_filters.FilterSet):

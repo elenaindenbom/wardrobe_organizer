@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Item, Care, Type, Purpose, Outfit, Use
+from wardrobe.models.item import Item, Care, Type, Purpose
+from wardrobe.models.outfit import Outfit, Use
 
 admin.site.register(Care)
 admin.site.register(Purpose)

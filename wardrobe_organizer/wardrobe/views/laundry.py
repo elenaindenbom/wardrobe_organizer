@@ -1,16 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404
-from django.views.decorators.cache import cache_page
-from .models import Outfit, Item, Laundry, Use
-from .forms import ItemForm, OutfitForm
+from django.shortcuts import get_object_or_404
+from wardrobe.models import Laundry, Item
+from wardrobe.filters import LaundryFilter
+from django.views.generic import ListView
 from django.shortcuts import redirect
-from django.conf import settings
-from datetime import datetime
-from .filters import ItemFilter, OutfitFilter, LaundryFilter
-
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
 
 
 @login_required
@@ -51,4 +44,3 @@ class LaundryList(ListView):
             queryset=Laundry.objects.filter(user=self.request.user)
         )
         return context
-

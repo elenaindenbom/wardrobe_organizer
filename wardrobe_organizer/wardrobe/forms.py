@@ -1,5 +1,6 @@
 from django import forms
-from .models import Item, Outfit
+from wardrobe.models.item import Item
+from wardrobe.models.outfit import Outfit
 
 
 class ItemForm(forms.ModelForm):

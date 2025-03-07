@@ -1,17 +1,13 @@
-from http.client import HTTPResponse
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
-from django.views.decorators.cache import cache_page
-from .models import Outfit, Item, Laundry, Use
-from .forms import ItemForm, OutfitForm
+from wardrobe.models import Item, Laundry
+from wardrobe.forms import ItemForm
 from django.shortcuts import redirect
-from django.conf import settings
-from datetime import datetime
-from .filters import ItemFilter, OutfitFilter, LaundryFilter
+from wardrobe.filters import OutfitFilter
+from wardrobe.utils import paginator
 
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView
 
 
 @login_required
@@ -108,5 +104,3 @@ def items_outfits(request, item_id):
         'filter': filter,
     }
     return render(request, template, context)
-
-

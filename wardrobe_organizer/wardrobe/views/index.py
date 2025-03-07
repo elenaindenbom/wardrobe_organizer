@@ -1,20 +1,7 @@
-from http.client import HTTPResponse
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404
-from django.views.decorators.cache import cache_page
-from .models import Outfit, Item, Laundry, Use
-from .forms import ItemForm, OutfitForm
-from django.shortcuts import redirect
+from django.shortcuts import render
 from django.conf import settings
-from datetime import datetime
-from .filters import ItemFilter, OutfitFilter, LaundryFilter
-
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView
-
-
-CACHE_UPDATE_FREQUENCY = 20
+from wardrobe.filters import ItemFilter
 
 
 def paginator(items, request):
@@ -24,7 +11,6 @@ def paginator(items, request):
     return paginator.get_page(page_number)
 
 
-@cache_page(CACHE_UPDATE_FREQUENCY, key_prefix='index_page')
 def index(request):
     """Главная страница"""
     title = 'Гардероб'
