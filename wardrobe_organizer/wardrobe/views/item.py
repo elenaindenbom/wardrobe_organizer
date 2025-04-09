@@ -4,18 +4,17 @@ from wardrobe.models import Item, Laundry
 from wardrobe.forms import ItemForm
 from django.shortcuts import redirect
 from wardrobe.filters import OutfitFilter
-from wardrobe.utils import paginator
+from wardrobe.utils import paginator, owner_only
 
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
 
+@owner_only(Item)
 @login_required
 def item_detail(request, item_id):
     """Страница предмета"""
     item = get_object_or_404(Item, id=item_id)
-    if item.user != request.user:
-        return redirect('wardrobe:index')
     laundry = False
     if Laundry.objects.filter(user=request.user).filter(item=item_id):
         laundry = True
@@ -57,12 +56,11 @@ class ItemCreate(CreateView):
         return super().form_valid(form)
 
 
+@owner_only(Item)
 @login_required
 def item_edit(request, item_id):
     """Редактирование предмета"""
     item = get_object_or_404(Item, pk=item_id)
-    if item.user != request.user:
-        return redirect('wardrobe:index')
 
     form = ItemForm(
         request.POST or None,
@@ -80,16 +78,17 @@ def item_edit(request, item_id):
     return render(request, 'wardrobe/create_object.html', context)
 
 
+@owner_only(Item)
 @login_required
 def item_delete(request, item_id):
     """Удаление предмета"""
     item = get_object_or_404(Item, pk=item_id)
-    if item.user != request.user:
-        return redirect('wardrobe:index')
     item.delete()
     return redirect('wardrobe:index')
 
 
+@owner_only(Item)
+@login_required
 def items_outfits(request, item_id):
     """Вывод комплектов содержащих предмет"""
     template = 'wardrobe/outfit_list.html'

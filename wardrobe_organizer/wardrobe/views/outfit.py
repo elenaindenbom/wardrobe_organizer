@@ -7,8 +7,10 @@ from django.shortcuts import redirect
 from datetime import datetime
 from ..filters import OutfitFilter
 from wardrobe.utils import paginator
+from wardrobe.utils import owner_only
 
 
+@owner_only(Outfit)
 @login_required
 def outfit_detail(request, outfit_id):
     """Страница комплекта"""
@@ -51,6 +53,7 @@ def outfit_create(request):
     return render(request, 'wardrobe/create_object.html', {'form': form})
 
 
+@owner_only(Outfit)
 @login_required
 def outfit_edit(request, outfit_id):
     """Редактирование комплекта"""
@@ -91,6 +94,7 @@ def outfit_list(request):
     return render(request, template, context)
 
 
+@owner_only(Outfit)
 @login_required
 def outfit_delete(request, outfit_id):
     """Удаление комплекта"""
@@ -101,6 +105,7 @@ def outfit_delete(request, outfit_id):
     return redirect('wardrobe:outfit_list')
 
 
+@owner_only(Outfit)
 @login_required
 def outfit_use(request, outfit_id):
     """Добавление информации об использовании комплекта"""
@@ -114,6 +119,7 @@ def outfit_use(request, outfit_id):
     return redirect('wardrobe:outfit_detail', outfit_id=outfit_id)
 
 
+@owner_only(Outfit)
 @login_required
 def cancel_outfit_use(request, outfit_id):
     """Отмена использования комплекта в текущий день"""

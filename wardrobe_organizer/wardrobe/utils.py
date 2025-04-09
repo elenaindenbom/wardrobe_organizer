@@ -1,5 +1,8 @@
 from django.core.paginator import Paginator
 from django.conf import settings
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+from functools import wraps
 ...
 
 
@@ -10,9 +13,20 @@ def paginator(items, request):
     return paginator.get_page(page_number)
 
 
-# def owner_only(func, object):
-#     def check_user(request, *args, **kwargs):
-#         if request.user == object.user:
-#             return func(request, *args, **kwargs)
-#         return redirect('wardrobe:index')
-#     return check_user
+def owner_only(model, owner_attr='user', redirect_url='wardrobe:index'):
+    """Декоратор предоставляет доступ к объекту только владельцу"""
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            try:
+                obj_id = tuple(kwargs.values())[0]
+            except IndexError:
+                return view_func(request, *args, **kwargs)
+            else:
+                obj = get_object_or_404(model, id=obj_id)
+                if request.user != getattr(obj, owner_attr):
+                    messages.error(request, "Доступ запрещен")
+                    return redirect(redirect_url)
+                return view_func(request, *args, **kwargs)
+        return wrapper
+    return decorator

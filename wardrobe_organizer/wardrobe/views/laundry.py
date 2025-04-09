@@ -4,8 +4,10 @@ from wardrobe.models import Laundry, Item
 from wardrobe.filters import LaundryFilter
 from django.views.generic import ListView
 from django.shortcuts import redirect
+from wardrobe.utils import owner_only
 
 
+@owner_only(Item)
 @login_required
 def add_laundry(request, item_id):
     """Добавление в список стирки"""
@@ -17,6 +19,7 @@ def add_laundry(request, item_id):
     return redirect('wardrobe:item_detail', item_id=item_id)
 
 
+@owner_only(Item)
 @login_required
 def del_laundry(request, item_id):
     """Добавление в список стирки"""
