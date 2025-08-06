@@ -21,6 +21,7 @@ def owner_only(model, owner_attr='user', redirect_url='wardrobe:index'):
             try:
                 obj_id = tuple(kwargs.values())[0]
             except IndexError:
+                print('Этод декоратор не работае для этой функкции')
                 return view_func(request, *args, **kwargs)
             else:
                 obj = get_object_or_404(model, id=obj_id)
